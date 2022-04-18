@@ -1,5 +1,6 @@
 package com.micropos.products.repository;
 
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.micropos.products.model.Product;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -17,6 +18,7 @@ import java.util.List;
 @Component
 public class JDParser {
 
+    @SentinelResource(fallback = "parseJDFallback")
     @Cacheable(value = "JD", key = "#keyword")
     public List<Product> parseJD(String keyword) throws IOException {
         String url = "https://search.jd.com/Search?keyword=" + keyword;
@@ -37,5 +39,11 @@ public class JDParser {
             list.add(product);
         }
         return list;
+    }
+
+    public List<Product> parseJDFallback(String keyword) {
+        List<Product> products = new ArrayList<Product>();
+        products.add(new Product("1", "product name", 0, "product img"));
+        return products;
     }
 }
